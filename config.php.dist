@@ -1,0 +1,13 @@
+<?php
+/*
+ * user-account for uploading
+ * copy to config.php
+ *
+ * Note: the password needs to be a token generated from the webclient in Settings / Security / Devices & session
+ */
+$config = [
+    'nextcloud' => '',
+    'username'  => '',
+    'password'  => '',
+    'debug'     => false
+];
