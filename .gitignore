@@ -1,6 +1,8 @@
 
 \.idea/
 
+composer.lock
+config.php
 vendor/
 /nbproject/private/
 project.*

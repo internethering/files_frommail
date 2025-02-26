@@ -40,15 +40,15 @@ use OCP\AppFramework\App;
 class Application extends App {
 
 
-	const APP_NAME = 'files_frommail';
+    const APP_NAME = 'files_frommail';
 
 
-	/**
-	 * @param array $params
-	 */
-	public function __construct(array $params = array()) {
-		parent::__construct(self::APP_NAME, $params);
-	}
+    /**
+     * @param array $params
+     */
+    public function __construct(array $params = array()) {
+        parent::__construct(self::APP_NAME, $params);
+    }
 
 }
 

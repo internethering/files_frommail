@@ -46,57 +46,57 @@ use OCP\IRequest;
  */
 class RemoteController extends Controller {
 
-	/** @var string */
-	private $userId;
+    /** @var string */
+    private $userId;
 
-	/** @var MailService */
-	private $mailService;
+    /** @var MailService */
+    private $mailService;
 
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * RemoteController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param string $userId
-	 * @param MailService $mailService
-	 * @param MiscService $miscService
-	 */
-	function __construct(IRequest $request, $userId, MailService $mailService, MiscService $miscService) {
-		parent::__construct(Application::APP_NAME, $request);
-		$this->userId = $userId;
-
-		$this->mailService = $mailService;
-		$this->miscService = $miscService;
-	}
+    /** @var MiscService */
+    private $miscService;
 
 
-	/**
-	 * endpoint that will receive mail content from NextcloudMailCatcher.php
-	 *
-	 * @NoAdminRequired
-	 * @NoCSRFRequired
-	 *
-	 * @param $content
-	 *
-	 * @return DataResponse
-	 */
-	public function getContent($content): DataResponse {
-		try {
-			if ($content !== 'null') {
-				$content = base64_decode(rawurldecode($content));
-				$this->mailService->parseMail($content, $this->userId);
-			}
+    /**
+     * RemoteController constructor.
+     *
+     * @param IRequest $request
+     * @param string $userId
+     * @param MailService $mailService
+     * @param MiscService $miscService
+     */
+    function __construct(IRequest $request, $userId, MailService $mailService, MiscService $miscService) {
+        parent::__construct(Application::APP_NAME, $request);
+        $this->userId = $userId;
 
-			return new DataResponse(['ok'], Http::STATUS_CREATED);
-		} catch (Exception $e) {
-			$this->miscService->log('issue while getContent() : ' . $e->getMessage());
+        $this->mailService = $mailService;
+        $this->miscService = $miscService;
+    }
 
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CREATED);
-		}
-	}
+
+    /**
+     * endpoint that will receive mail content from NextcloudMailCatcher.php
+     *
+     * @NoAdminRequired
+     * @NoCSRFRequired
+     *
+     * @param $content
+     *
+     * @return DataResponse
+     */
+    public function getContent($content): DataResponse {
+        try {
+            if ($content !== 'null') {
+                $content = base64_decode(rawurldecode($content));
+                $this->mailService->parseMail($content, $this->userId);
+            }
+
+            return new DataResponse(['ok'], Http::STATUS_CREATED);
+        } catch (Exception $e) {
+            $this->miscService->log('issue while getContent() : ' . $e->getMessage());
+
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_CREATED);
+        }
+    }
 
 }
 

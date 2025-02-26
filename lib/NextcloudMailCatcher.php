@@ -1,5 +1,5 @@
+#!/usr/bin/env php
 <?php declare(strict_types=1);
-
 
 /**
  * Files_FromMail - Recover your email attachments from your cloud.
@@ -26,213 +26,204 @@
  *
  */
 
-
-$config = [
-	'nextcloud' => 'https://cloud.example.net/',
-	'username'  => 'frommail',
-	'password'  => 'Ledxc-jRFiR-wBMXD-jyyjt-Y87CZ',
-	'debug'     => false
-];
-
-
-// --- do not edit below this line ---
+include dirname(__FILE__) . '/../config.php';
 
 class NextcloudMailCatcher {
 
 
-	/** @var string */
-	private $content;
+    /** @var string */
+    private $content;
 
-	/** @var array */
-	private $config;
-
-
-	/**
-	 * NextcloudMailCatcher constructor.
-	 *
-	 * @param array $config
-	 */
-	public function __construct(array $config) {
-		$nextcloud = $config['nextcloud'];
-		if (substr($nextcloud, -1) === '/') {
-			$config['nextcloud'] = substr($nextcloud, 0, -1);
-		}
-
-		$this->config = $config;
-	}
+    /** @var array */
+    private $config;
 
 
-	/**
-	 * @param $content
-	 *
-	 * @return $this
-	 */
-	public function setContent(string $content): self {
-		$this->content = $content;
+    /**
+     * NextcloudMailCatcher constructor.
+     *
+     * @param array $config
+     */
+    public function __construct(array $config) {
+        $nextcloud = $config['nextcloud'];
+        if (substr($nextcloud, -1) === '/') {
+            $config['nextcloud'] = substr($nextcloud, 0, -1);
+        }
 
-		return $this;
-	}
-
-
-	/**
-	 * @return string
-	 */
-	public function getContent(): string {
-		return $this->content;
-	}
+        $this->config = $config;
+    }
 
 
-	/**
-	 *
-	 */
-	public function sendToNextcloud(): void {
-		$content = rawurlencode(base64_encode($this->getContent()));
+    /**
+     * @param $content
+     *
+     * @return $this
+     */
+    public function setContent(string $content): self {
+        $this->content = $content;
 
-		$curl = $this->generateAuthedCurl();
-		$this->fillCurlWithContent($curl, 'content=' . $content);
-
-		$result = curl_exec($curl);
-
-		$this->debugCurl($curl, $result);
-	}
+        return $this;
+    }
 
 
-	/**
-	 *
-	 */
-	public function test(): void {
-		$this->config['debug'] = true;
-		$this->debug('testing!');
-
-		$pwd = $this->config['password'];
-		if (substr($pwd, 5, 1) !== '-') {
-			$this->debug('');
-			$this->debug('Error: password have to be a generated token');
-			$this->debug(
-				'Generate a token on the webclient: Settings / Security / Devices & session'
-			);
-			exit();
-		}
-
-		$curl = $this->generateAuthedCurl();
-		$this->fillCurlWithContent($curl, 'content=null');
-
-		$result = curl_exec($curl);
-
-		$this->debugCurl($curl, $result);
-	}
+    /**
+     * @return string
+     */
+    public function getContent(): string {
+        return $this->content;
+    }
 
 
-	/**
-	 * @param resource $curl
-	 * @param string|array $result
-	 */
-	private function debugCurl($curl, $result): void {
-		if ($result === false) {
-			$this->debug('Mail NOT forwarded: ' . curl_error($curl));
+    /**
+     *
+     */
+    public function sendToNextcloud(): void {
+        $content = rawurlencode(base64_encode($this->getContent()));
 
-			return;
-		}
+        $curl = $this->generateAuthedCurl();
+        $this->fillCurlWithContent($curl, 'content=' . $content);
 
-		try {
-			$this->debugCurlResponseCode($curl);
-		} catch (Exception $e) {
-			$this->debug('Mail NOT forwarded: ' . $e->getMessage());
+        $result = curl_exec($curl);
 
-			return;
-		}
-
-		$this->debug('Mail forwarded, result was ' . $result);
-	}
+        $this->debugCurl($curl, $result);
+    }
 
 
-	/**
-	 * @param $curl
-	 *
-	 * @throws Exception
-	 */
-	private function debugCurlResponseCode($curl) {
+    /**
+     *
+     */
+    public function test(): void {
+        $this->config['debug'] = true;
+        $this->debug('testing!');
 
-		$code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-		if ($code === 201) {
-			return;
-		}
+        $pwd = $this->config['password'];
+        if (substr($pwd, 5, 1) !== '-') {
+            $this->debug('');
+            $this->debug('Error: password have to be a generated token');
+            $this->debug(
+                'Generate a token on the webclient: Settings / Security / Devices & session'
+            );
+            exit();
+        }
 
-		if ($code === 401 || $code === 500) {
-			throw new Exception('Unauthorized access');
-		}
+        $curl = $this->generateAuthedCurl();
+        $this->fillCurlWithContent($curl, 'content=null');
 
-		if ($code === 404) {
-			throw new Exception('404 Not Found');
-		}
+        $result = curl_exec($curl);
 
-		if ($code === 503 || $code === 302) {
-			throw new Exception('The \'files_frommail\' app does not seems enabled');
-		}
-
-		throw new Exception('Request returned code ' . $code);
-	}
+        $this->debugCurl($curl, $result);
+    }
 
 
-	/**
-	 * @return resource
-	 */
-	private function generateAuthedCurl() {
+    /**
+     * @param resource $curl
+     * @param string|array $result
+     */
+    private function debugCurl($curl, $result): void {
+        if ($result === false) {
+            $this->debug('Mail NOT forwarded: ' . curl_error($curl));
 
-		$url = $this->config['nextcloud'] . '/index.php/apps/files_frommail/remote';
-		$curl = curl_init($url);
+            return;
+        }
 
-		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-		curl_setopt(
-			$curl, CURLOPT_USERPWD,
-			$this->config['username'] . ':' . $this->config['password']
-		);
+        try {
+            $this->debugCurlResponseCode($curl);
+        } catch (Exception $e) {
+            $this->debug('Mail NOT forwarded: ' . $e->getMessage());
 
-		$this->debug(
-			'Generate curl request to ' . $url . ' with username \'' . $this->config['username']
-			. '\''
-		);
+            return;
+        }
 
-		return $curl;
-	}
-
-
-	/**
-	 * @param resource $curl
-	 * @param string $put
-	 */
-	private function fillCurlWithContent(&$curl, string $put): void {
-
-		curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
-		curl_setopt($curl, CURLOPT_POSTFIELDS, $put);
-
-		$length = strlen($put);
-		curl_setopt(
-			$curl, CURLOPT_HTTPHEADER,
-			[
-				'Content-type: application/x-www-form-urlencoded',
-				'OCS-APIRequest: true',
-				'Content-Length: ' . $length
-			]
-		);
-
-		$this->debug('Content-Length: ' . $length . ' (' . round($length / 1024 / 1024, 1) . 'MB)');
-	}
+        $this->debug('Mail forwarded, result was ' . $result);
+    }
 
 
-	/**
-	 * @param string $string
-	 */
-	private function debug(string $string): void {
-		if (!array_key_exists('debug', $this->config) || $this->config['debug'] !== true) {
-			return;
-		}
+    /**
+     * @param $curl
+     *
+     * @throws Exception
+     */
+    private function debugCurlResponseCode($curl) {
 
-		echo $string . "\n";
-//		$log = '/tmp/' . basename(__FILE__, '.php') . '.log';
-//		file_put_contents($log, date('Y-m-d H:i:s') . ' ' . $string . "\n", FILE_APPEND);
-	}
+        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($code === 201) {
+            return;
+        }
+
+        if ($code === 401 || $code === 500) {
+            throw new Exception('Unauthorized access');
+        }
+
+        if ($code === 404) {
+            throw new Exception('404 Not Found');
+        }
+
+        if ($code === 503 || $code === 302) {
+            throw new Exception('The \'files_frommail\' app does not seems enabled');
+        }
+
+        throw new Exception('Request returned code ' . $code);
+    }
+
+
+    /**
+     * @return resource
+     */
+    private function generateAuthedCurl() {
+
+        $url = $this->config['nextcloud'] . '/index.php/apps/files_frommail/remote';
+        $curl = curl_init($url);
+
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt(
+            $curl, CURLOPT_USERPWD,
+            $this->config['username'] . ':' . $this->config['password']
+        );
+
+        $this->debug(
+            'Generate curl request to ' . $url . ' with username \'' . $this->config['username']
+            . '\''
+        );
+
+        return $curl;
+    }
+
+
+    /**
+     * @param resource $curl
+     * @param string $put
+     */
+    private function fillCurlWithContent(&$curl, string $put): void {
+
+        curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PUT');
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $put);
+
+        $length = strlen($put);
+        curl_setopt(
+            $curl, CURLOPT_HTTPHEADER,
+            [
+                'Content-type: application/x-www-form-urlencoded',
+                'OCS-APIRequest: true',
+                'Content-Length: ' . $length
+            ]
+        );
+
+        $this->debug('Content-Length: ' . $length . ' (' . round($length / 1024 / 1024, 1) . 'MB)');
+    }
+
+
+    /**
+     * @param string $string
+     */
+    private function debug(string $string): void {
+        if (!array_key_exists('debug', $this->config) || $this->config['debug'] !== true) {
+            return;
+        }
+
+        echo $string . "\n";
+        $log = '/tmp/' . basename(__FILE__, '.php') . '.log';
+        file_put_contents($log, date('Y-m-d H:i:s') . ' ' . $string . "\n", FILE_APPEND);
+    }
 
 }
 
@@ -240,9 +231,9 @@ class NextcloudMailCatcher {
 $mailCatcher = new NextcloudMailCatcher($config);
 
 if (sizeof($argv) === 2 && $argv[1] === 'test') {
-	$mailCatcher->test();
+    $mailCatcher->test();
 
-	return;
+    return;
 }
 
 echo 'Catching a new mail';
@@ -250,12 +241,8 @@ echo 'Catching a new mail';
 $content = '';
 $fd = fopen('php://stdin', 'r');
 while (!feof($fd)) {
-	$content .= fread($fd, 1024);
+    $content .= fread($fd, 1024);
 }
 
 $mailCatcher->setContent($content);
 $mailCatcher->sendToNextcloud();
-
-
-
-

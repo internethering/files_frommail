@@ -28,11 +28,11 @@
 
 
 return [
-	'routes' => [
-		['name' => 'Remote#getContent', 'url' => '/remote', 'verb' => 'PUT'],
-		['name' => 'Navigation#getMailbox', 'url' => '/admin/mailbox', 'verb' => 'GET'],
-		['name' => 'Navigation#newMailbox', 'url' => '/admin/mailbox', 'verb' => 'POST'],
-		['name' => 'Navigation#deleteMailbox', 'url' => '/admin/mailbox', 'verb' => 'DELETE']
-	]
+    'routes' => [
+        ['name' => 'Remote#getContent', 'url' => '/remote', 'verb' => 'PUT'],
+        ['name' => 'Navigation#getMailbox', 'url' => '/admin/mailbox', 'verb' => 'GET'],
+        ['name' => 'Navigation#newMailbox', 'url' => '/admin/mailbox', 'verb' => 'POST'],
+        ['name' => 'Navigation#deleteMailbox', 'url' => '/admin/mailbox', 'verb' => 'DELETE']
+    ]
 ];
 

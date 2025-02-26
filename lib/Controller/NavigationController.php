@@ -47,74 +47,74 @@ use OCP\IRequest;
 class NavigationController extends Controller {
 
 
-	/** @var MailService */
-	private $mailService;
+    /** @var MailService */
+    private $mailService;
 
-	/** @var MiscService */
-	private $miscService;
-
-
-	/**
-	 * RemoteController constructor.
-	 *
-	 * @param IRequest $request
-	 * @param string $userId
-	 * @param MailService $mailService
-	 * @param MiscService $miscService
-	 */
-	function __construct(IRequest $request, MailService $mailService, MiscService $miscService) {
-		parent::__construct(Application::APP_NAME, $request);
-
-		$this->mailService = $mailService;
-		$this->miscService = $miscService;
-	}
+    /** @var MiscService */
+    private $miscService;
 
 
-	/**
-	 * @return DataResponse
-	 */
-	public function getMailbox(): DataResponse {
-		try {
-			$mailbox = $this->mailService->getMailAddresses();
+    /**
+     * RemoteController constructor.
+     *
+     * @param IRequest $request
+     * @param string $userId
+     * @param MailService $mailService
+     * @param MiscService $miscService
+     */
+    function __construct(IRequest $request, MailService $mailService, MiscService $miscService) {
+        parent::__construct(Application::APP_NAME, $request);
 
-			return new DataResponse($mailbox, Http::STATUS_CREATED);
-		} catch (Exception $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-		}
-	}
-
-
-	/**
-	 * @param string $address
-	 * @param string $password
-	 *
-	 * @return DataResponse
-	 */
-	public function newMailbox(string $address, string $password): DataResponse {
-		try {
-			$this->mailService->addMailAddress($address, $password);
-
-			return new DataResponse(['ok'], Http::STATUS_CREATED);
-		} catch (Exception $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-		}
-	}
+        $this->mailService = $mailService;
+        $this->miscService = $miscService;
+    }
 
 
-	/**
-	 * @param string $address
-	 *
-	 * @return DataResponse
-	 */
-	public function deleteMailbox(string $address): DataResponse {
-		try {
-			$this->mailService->removeMailAddress($address);
+    /**
+     * @return DataResponse
+     */
+    public function getMailbox(): DataResponse {
+        try {
+            $mailbox = $this->mailService->getMailAddresses();
 
-			return new DataResponse(['ok'], Http::STATUS_CREATED);
-		} catch (Exception $e) {
-			return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
-		}
-	}
+            return new DataResponse($mailbox, Http::STATUS_CREATED);
+        } catch (Exception $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+        }
+    }
+
+
+    /**
+     * @param string $address
+     * @param string $password
+     *
+     * @return DataResponse
+     */
+    public function newMailbox(string $address, string $password): DataResponse {
+        try {
+            $this->mailService->addMailAddress($address, $password);
+
+            return new DataResponse(['ok'], Http::STATUS_CREATED);
+        } catch (Exception $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+        }
+    }
+
+
+    /**
+     * @param string $address
+     *
+     * @return DataResponse
+     */
+    public function deleteMailbox(string $address): DataResponse {
+        try {
+            $this->mailService->removeMailAddress($address);
+
+            return new DataResponse(['ok'], Http::STATUS_CREATED);
+        } catch (Exception $e) {
+            return new DataResponse(['error' => $e->getMessage()], Http::STATUS_BAD_REQUEST);
+        }
+    }
 
 
 }

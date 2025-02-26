@@ -1,14 +1,9 @@
 ### files_frommail
 
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/nextcloud/files_frommail/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/nextcloud/files_frommail/?branch=master)
-
 **Files From Mail** allow an admin to link a drop-mailbox to Nextcloud.   
 This way, you can set a mail address (_files@example.net_ in our example) and every mails+attachments send to this mail address will be automatically be saved on the cloud.
 
-
-
 ![](https://raw.githubusercontent.com/nextcloud/files_frommail/master/screenshots/v0.1.0.png)
-
 
 ### dependencies
 
@@ -17,34 +12,10 @@ If not already installed on your server:
 
 ```
 $ sudo pecl install mailparse
-```
-
-If the installation failed with a message about mbstring not installed (but mbstring is already installed) you will need to install the	Mailparse extension manually:
-
-```
-$ pecl download mailparse
-$ tar -zxvf mailparse-3.0.2.tgz
-$ cd mailparse-3.0.2/
-$ phpize
-$ vi mailparse.c
-```
-
-remove lines 34-37:
->     #if !HAVE_MBSTRING                                                                                                                                                                    
->     #error The mailparse extension requires the mbstring extension!                                                                                                                       
->     #endif                          
-
-```
-$ ./configure --with-php-config=/usr/bin/php-config
-$ make
-$ sudo make install
-$ sudo echo "extension=mailparse.so" > /etc/php/7.3/mods-available/mailparse.ini
-$ sudo ln -s /etc/php/7.3/mods-available/mailparse.ini /etc/php/7.3/apache2/conf.d/20-mailparse.ini
+$ sudo echo "extension=mailparse.so" > /etc/php/8.3/mods-available/mailparse.ini
+$ sudo ln -s /etc/php/8.3/mods-available/mailparse.ini /etc/php/8.3/apache2/conf.d/20-mailparse.ini
 $ sudo apachectl restart
 ```
-
-
-
 ### configuration mail server
 
 You now need to tell your mail server that any mails coming to a specific address (in our example: _files@mailserver.example.net_) will be redirected to a PHP script:
@@ -59,7 +30,7 @@ Recreate the aliases db:
 $ sudo newaliases
 ```
 
-Edit **NextcloudMailCatcher.php** and edit the few settings:
+Copy config.php.dist to **config.php** and edit the few settings:
 
 
 >     $config = [
@@ -73,17 +44,13 @@ _Note: the password needs to be a token generated from the webclient in **Settin
 
 You can test your setup by running:
 
->     $ php -f ./NextcloudMailCatcher.php test
-
-
+>     $ php -f ./lib/NextcloudMailCatcher.php test
 
 ### Virtual domain
 
 In case you're using virtual domain (postfix), you will need to create an alias in your MTA: 
 
 >     files@example.com -> files@mailserver.example.net 
-
-
 
 ### Add the drop mailbox address to Nextcloud
 
