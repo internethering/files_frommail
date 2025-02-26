@@ -1,15 +1,15 @@
 {
-  "name": "nextcloud/files_frommail",
+  "name": "internethering/files_frommail",
   "description": "Files From Mail",
   "minimum-stability": "stable",
   "license": "agpl",
   "authors": [
     {
-      "name": "Maxence Lange",
-      "email": "maxence@artificial-owl.com"
+      "name": "Richard Hering",
+      "email": "der@internethering.de"
     }
   ],
   "require": {
-    "php-mime-mail-parser/php-mime-mail-parser": "5.0.5"
+    "php-mime-mail-parser/php-mime-mail-parser": "9.0."
   }
 }
