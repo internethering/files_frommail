@@ -29,6 +29,8 @@
 
 namespace OCA\Files_FromMail\AppInfo;
 
+require_once __DIR__ . '/../../appinfo/autoload.php';
+
 use OCP\AppFramework\App;
 
 
